@@ -29,6 +29,7 @@ const NetworkTestApp: React.FC = () => {
   const openEstimator = () => setIsEstimatorOpen(true);
   const closeEstimator = () => setIsEstimatorOpen(false);
 
+  // Fetch data function
   const fetchData = async () => {
     setLoading(true);
     setResults({
@@ -89,11 +90,12 @@ const NetworkTestApp: React.FC = () => {
     try {
       const uploadStart = Date.now();
 
+      // Include the x-start-time header in the upload request
       const uploadResponse = await fetch(API_URL + "upload", {
         method: "POST",
         body: formData,
         headers: {
-          "x-start-time": uploadStart.toString(), 
+          "x-start-time": uploadStart.toString(), // Send the start time as a string
         },
       });
 
@@ -103,6 +105,7 @@ const NetworkTestApp: React.FC = () => {
 
       const uploadData = await uploadResponse.json();
 
+      // Calculate upload speed based on client-side timing if server doesn't provide uploadTime
       const uploadTime = uploadData.uploadTime || Date.now() - uploadStart;
       uploadSpeed = (blob.size / (uploadTime / 1000)) / 1024 / 1024;
 
@@ -121,6 +124,7 @@ const NetworkTestApp: React.FC = () => {
       fetchTest("firewall-check", "firewall"),
     ]);
 
+    // Add current results to history
     setHistory((prev) => [
       ...prev,
       {
@@ -135,12 +139,13 @@ const NetworkTestApp: React.FC = () => {
   };
 
 
+  // Initialize or update the chart
   useEffect(() => {
     if (typeof window !== "undefined" && history.length > 0) {
       const ctx = document.getElementById("historyChart") as HTMLCanvasElement | null;
       if (!ctx) return;
 
-      if (chart) chart.destroy();
+      if (chart) chart.destroy(); // Destroy existing chart instance
 
       const newChart = new Chart(ctx, {
         type: "line",
@@ -172,53 +177,38 @@ const NetworkTestApp: React.FC = () => {
           scales: {
             y: {
               beginAtZero: true,
-              ticks: {
-                color: "#ffffff", 
-              },
-            },
-            x: {
-              ticks: {
-                color: "#ffffff",
-              },
-            },
-          },
-          plugins: {
-            legend: {
-              labels: {
-                color: "#ffffff", 
-              },
             },
           },
         },
       });
-      
 
       setChart(newChart);
     }
   }, [history]);
 
+  // Fetch data on component mount
   useEffect(() => {
     fetchData();
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#110e24] text-white p-8 flex flex-col items-center">
+    <div className="min-h-screen bg-[#110e24] text-gray-100 p-8 flex flex-col items-center">
       <button
         className="fixed bottom-8 right-8 bg-[#00cada] text-white p-4 rounded-full shadow-lg hover:bg-[#0099a8] transition-colors"
         aria-label="Chatbot"
       >
-        <FaRobot className="text-2xl text-white" />
+        <FaRobot className="text-2xl" />
       </button>
 
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6 col-span-3">
-          <h1 className="text-3xl font-bold text-white">Network Traffic Dashboard</h1>
+          <h1 className="text-3xl font-bold text-[#00cada]">Network Traffic Dashboard</h1>
           <div className="flex flex-row mt-3 ">
             <button
               onClick={fetchData}
               className="flex items-center bg-[#00cada] text-white px-4 py-2 rounded-lg hover:bg-[#0099a8] transition-colors"
             >
-              <FaSync className={`mr-2 text-white ${loading ? "animate-spin" : ""}`} />
+              <FaSync className={`mr-2 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </button>
           </div>
@@ -226,21 +216,21 @@ const NetworkTestApp: React.FC = () => {
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">IP Address</h2>
-          <p className="text-white mt-1">{results.ip}</p>
+          <p className="text-[#69639c] mt-1">{results.ip}</p>
         </div>
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">Ping</h2>
-          <p className="text-white mt-1">{results.ping}</p>
+          <p className="text-[#69639c] mt-1">{results.ping}</p>
           <div className="w-full h-2 bg-[#69639c] rounded-lg mt-2 overflow-hidden">
             <div
               className="h-2 rounded-lg"
               style={{
                 width: `${Math.min(100, parseFloat(results.ping as string) / 5)}%`,
-                backgroundColor: `rgb(${Math.min(255, (parseFloat(results.ping as string) / 2) * 5)}, 0, ${Math.max(
+                backgroundColor: `rgb(${Math.min(255, parseFloat(results.ping as string) / 2)}, ${Math.max(
                   0,
-                  255 - (parseFloat(results.ping as string) / 2) * 5
-                )})`,                
+                  255 - parseFloat(results.ping as string) / 2
+                )}, 0)`,
               }}
             ></div>
           </div>
@@ -254,8 +244,8 @@ const NetworkTestApp: React.FC = () => {
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">Network Speed</h2>
           <div className="flex justify-between">
-            <p className="text-white mt-1">{results.download}</p>
-            <p className="text-white mt-1">{results.upload}</p>
+            <p className="text-[#69639c] mt-1">{results.download}</p>
+            <p className="text-[#69639c] mt-1">{results.upload}</p>
           </div>
           <progress value={progress} max="100" className="w-full mt-2"></progress>
           <button
@@ -281,32 +271,32 @@ const NetworkTestApp: React.FC = () => {
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">Nmap Scan</h2>
-          <p className="text-white mt-1">{results.nmap}</p>
+          <p className="text-[#69639c] mt-1">{results.nmap}</p>
         </div>
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">Open Ports</h2>
-          <p className="text-white mt-1">{results.ports}</p>
+          <p className="text-[#69639c] mt-1">{results.ports}</p>
         </div>
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">Services</h2>
-          <p className="text-white mt-1">{results.services}</p>
+          <p className="text-[#69639c] mt-1">{results.services}</p>
         </div>
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">Vulnerability Scan</h2>
-          <p className="text-white mt-1">{results.vuln}</p>
+          <p className="text-[#69639c] mt-1">{results.vuln}</p>
         </div>
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">SSL Check</h2>
-          <p className="text-white mt-1">{results.ssl}</p>
+          <p className="text-[#69639c] mt-1">{results.ssl}</p>
         </div>
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">Firewall Check</h2>
-          <p className="text-white mt-1">{results.firewall}</p>
+          <p className="text-[#69639c] mt-1">{results.firewall}</p>
         </div>
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6 col-span-3">
