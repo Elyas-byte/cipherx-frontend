@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Chart } from "chart.js/auto";
 import { FaSync, FaRobot } from "react-icons/fa";
-import FileTransferEstimator from './components/calculator';
+import FileTransferEstimator from "./components/calculator";
 
 type Result = {
   [key: string]: string | number;
