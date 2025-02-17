@@ -16,7 +16,7 @@ type HistoryEntry = {
   upload: number;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://backend.themsovietbois.com:3001/";
 
 const NetworkTestApp: React.FC = () => {
   const [results, setResults] = useState<Result>({});
@@ -93,7 +93,7 @@ const NetworkTestApp: React.FC = () => {
         method: "POST",
         body: formData,
         headers: {
-          "x-start-time": uploadStart.toString(), 
+          "x-start-time": uploadStart.toString(),
         },
       });
 
@@ -173,7 +173,7 @@ const NetworkTestApp: React.FC = () => {
             y: {
               beginAtZero: true,
               ticks: {
-                color: "#ffffff", 
+                color: "#ffffff",
               },
             },
             x: {
@@ -185,13 +185,13 @@ const NetworkTestApp: React.FC = () => {
           plugins: {
             legend: {
               labels: {
-                color: "#ffffff", 
+                color: "#ffffff",
               },
             },
           },
         },
       });
-      
+
 
       setChart(newChart);
     }
@@ -223,11 +223,11 @@ const NetworkTestApp: React.FC = () => {
             </button>
           </div>
         </div>
-
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">IP Address</h2>
-          <p className="text-white mt-1">{results.ip}</p>
+          <p className="text-white mt-1 text-7xl flex justify-center items-center w-full">{results.ip.toString().replace(/^::ffff:/, '')}</p>
         </div>
+
 
         <div className="bg-[#1c1549] shadow-lg rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-[#00cada]">Ping</h2>
@@ -240,7 +240,7 @@ const NetworkTestApp: React.FC = () => {
                 backgroundColor: `rgb(${Math.min(255, (parseFloat(results.ping as string) / 2) * 5)}, 0, ${Math.max(
                   0,
                   255 - (parseFloat(results.ping as string) / 2) * 5
-                )})`,                
+                )})`,
               }}
             ></div>
           </div>
